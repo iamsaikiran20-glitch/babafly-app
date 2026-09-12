@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from 'react-router-dom'
 
-// Components
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 
-// Pages
 import Home from './pages/Home'
 import Products from './pages/Products'
+import ProductDetails from './pages/ProductDetails'
 import Categories from './pages/Categories'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
@@ -16,26 +19,35 @@ import Checkout from './pages/Checkout'
 import Orders from './pages/Orders'
 
 function App() {
+
   // Load cart from localStorage
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('babafly-cart')
 
-    return savedCart ? JSON.parse(savedCart) : []
+    return savedCart
+      ? JSON.parse(savedCart)
+      : []
   })
 
   // Save cart
   const saveCart = (newCart) => {
     setCart(newCart)
-    localStorage.setItem('babafly-cart', JSON.stringify(newCart))
+
+    localStorage.setItem(
+      'babafly-cart',
+      JSON.stringify(newCart)
+    )
   }
 
   // Add product to cart
   const addToCart = (product) => {
+
     const existingProduct = cart.find(
       (item) => item.id === product.id
     )
 
     if (existingProduct) {
+
       const newCart = cart.map((item) =>
         item.id === product.id
           ? {
@@ -46,7 +58,9 @@ function App() {
       )
 
       saveCart(newCart)
+
     } else {
+
       saveCart([
         ...cart,
         {
@@ -54,11 +68,13 @@ function App() {
           quantity: 1,
         },
       ])
+
     }
   }
 
   // Increase quantity
   const increaseQuantity = (id) => {
+
     const newCart = cart.map((item) =>
       item.id === id
         ? {
@@ -73,6 +89,7 @@ function App() {
 
   // Decrease quantity
   const decreaseQuantity = (id) => {
+
     const newCart = cart
       .map((item) =>
         item.id === id
@@ -87,14 +104,17 @@ function App() {
     saveCart(newCart)
   }
 
-  // Remove product completely
+  // Remove product
   const removeFromCart = (id) => {
-    const newCart = cart.filter((item) => item.id !== id)
+
+    const newCart = cart.filter(
+      (item) => item.id !== id
+    )
 
     saveCart(newCart)
   }
 
-  // Total number of products in cart
+  // Total cart items
   const cartCount = cart.reduce(
     (total, item) => total + item.quantity,
     0
@@ -102,29 +122,44 @@ function App() {
 
   return (
     <BrowserRouter>
-      {/* Navbar */}
+
       <Navbar cartCount={cartCount} />
 
       <Routes>
 
-        {/* Public Routes */}
+        {/* Home */}
         <Route
           path="/"
           element={<Home />}
         />
 
+        {/* Products */}
         <Route
           path="/products"
           element={
-            <Products addToCart={addToCart} />
+            <Products
+              addToCart={addToCart}
+            />
           }
         />
 
+        {/* Product Details */}
+        <Route
+          path="/products/:id"
+          element={
+            <ProductDetails
+              addToCart={addToCart}
+            />
+          }
+        />
+
+        {/* Categories */}
         <Route
           path="/categories"
           element={<Categories />}
         />
 
+        {/* Cart */}
         <Route
           path="/cart"
           element={
@@ -137,17 +172,19 @@ function App() {
           }
         />
 
+        {/* Login */}
         <Route
           path="/login"
           element={<Login />}
         />
 
+        {/* Register */}
         <Route
           path="/register"
           element={<Register />}
         />
 
-        {/* Protected Checkout Route */}
+        {/* Protected Checkout */}
         <Route
           path="/checkout"
           element={
@@ -160,7 +197,7 @@ function App() {
           }
         />
 
-        {/* Protected Orders Route */}
+        {/* Protected Orders */}
         <Route
           path="/orders"
           element={
@@ -171,6 +208,7 @@ function App() {
         />
 
       </Routes>
+
     </BrowserRouter>
   )
 }

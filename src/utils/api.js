@@ -1,3 +1,4 @@
+
 import axios from 'axios'
 
 const api = axios.create({
@@ -7,7 +8,7 @@ const api = axios.create({
   },
 })
 
-// Attach JWT token to every request
+// Add JWT token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('babafly-token')
@@ -25,9 +26,8 @@ api.interceptors.request.use(
 
 // Handle API errors
 api.interceptors.response.use(
-  (response) => {
-    return response
-  },
+  (response) => response,
+
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('babafly-token')
