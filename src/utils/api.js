@@ -1,14 +1,12 @@
-
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: 'https://fakestoreapi.com',
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Add JWT token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('babafly-token')
@@ -19,15 +17,11 @@ api.interceptors.request.use(
 
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
-// Handle API errors
 api.interceptors.response.use(
   (response) => response,
-
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('babafly-token')

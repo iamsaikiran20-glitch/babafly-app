@@ -1,10 +1,9 @@
- 
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
-// Validation rules
 const schema = yup.object({
   email: yup
     .string()
@@ -29,26 +28,23 @@ function Login() {
   })
 
   const onSubmit = (data) => {
-    // Get registered user
     const savedUser = localStorage.getItem('babafly-user')
 
     if (!savedUser) {
-      alert('No account found. Please register first.')
+      toast.error('No account found. Please register first.')
       return
     }
 
     const user = JSON.parse(savedUser)
 
-    // Check email and password
     if (
       data.email !== user.email ||
       data.password !== user.password
     ) {
-      alert('Invalid email or password ❌')
+      toast.error('Invalid email or password ❌')
       return
     }
 
-    // Login successful
     localStorage.setItem(
       'babafly-token',
       'demo-jwt-token'
@@ -59,22 +55,32 @@ function Login() {
       'true'
     )
 
-    alert('Login successful! 🎉')
+    toast.success('Login successful! 🎉')
 
-    navigate('/')
+    setTimeout(() => {
+      navigate('/')
+    }, 700)
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg sm:p-10">
 
-        <h1 className="text-3xl font-bold">
-          Welcome Back
-        </h1>
+        <div className="text-center">
 
-        <p className="mt-2 text-gray-600">
-          Login to your BabaFly account 💎
-        </p>
+          <div className="text-5xl">
+            💎
+          </div>
+
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">
+            Welcome Back
+          </h1>
+
+          <p className="mt-2 text-gray-500">
+            Login to your BabaFly account
+          </p>
+
+        </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -83,7 +89,8 @@ function Login() {
 
           {/* Email */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Email
             </label>
 
@@ -91,7 +98,11 @@ function Login() {
               type="email"
               placeholder="Enter your email"
               {...register('email')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.email
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.email && (
@@ -99,11 +110,13 @@ function Login() {
                 {errors.email.message}
               </p>
             )}
+
           </div>
 
           {/* Password */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Password
             </label>
 
@@ -111,7 +124,11 @@ function Login() {
               type="password"
               placeholder="Enter your password"
               {...register('password')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.password
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.password && (
@@ -119,12 +136,12 @@ function Login() {
                 {errors.password.message}
               </p>
             )}
+
           </div>
 
-          {/* Login button */}
           <button
             type="submit"
-            className="w-full rounded-full bg-gray-900 py-3 font-semibold text-white transition hover:bg-gray-700"
+            className="w-full rounded-full bg-gray-900 py-3.5 font-semibold text-white transition hover:bg-gray-700"
           >
             Login
           </button>
@@ -136,9 +153,9 @@ function Login() {
 
           <Link
             to="/register"
-            className="font-semibold text-gray-900 underline"
+            className="font-semibold text-gray-900 hover:underline"
           >
-            Create Account
+            Register
           </Link>
         </p>
 

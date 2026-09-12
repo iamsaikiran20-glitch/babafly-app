@@ -1,178 +1,137 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Orders() {
-  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const savedOrders =
-      JSON.parse(localStorage.getItem('orders')) || []
+    try {
+      const savedOrders = JSON.parse(
+        localStorage.getItem('babafly-orders') || '[]'
+      )
 
-    setOrders(savedOrders)
+      setOrders(savedOrders)
+    } catch (error) {
+      console.error('Failed to load orders:', error)
+      setOrders([])
+    }
   }, [])
 
+  if (orders.length === 0) {
+    return (
+      <main className="mx-auto max-w-5xl px-6 py-20 text-center">
+        <div className="text-7xl">📦</div>
+
+        <h1 className="mt-6 text-3xl font-bold text-gray-900">
+          No Orders Yet
+        </h1>
+
+        <p className="mt-3 text-gray-500">
+          Your placed orders will appear here.
+        </p>
+
+        <Link
+          to="/products"
+          className="mt-7 inline-block rounded-full bg-gray-900 px-7 py-3 font-semibold text-white transition hover:bg-gray-700"
+        >
+          Start Shopping
+        </Link>
+      </main>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="mx-auto max-w-5xl">
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-gray-900">
+          My Orders
+        </h1>
 
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-4xl font-bold">
-            My Orders 📦
-          </h1>
-
-          <button
-            onClick={() => navigate('/products')}
-            className="rounded-full bg-gray-900 px-6 py-3 font-semibold text-white"
-          >
-            Continue Shopping
-          </button>
-        </div>
-
-        {orders.length === 0 ? (
-          <div className="rounded-2xl bg-white p-10 text-center shadow">
-
-            <div className="mb-4 text-6xl">
-              📦
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              No Orders Yet
-            </h2>
-
-            <p className="mt-2 text-gray-500">
-              Your purchased jewellery will appear here.
-            </p>
-
-            <button
-              onClick={() => navigate('/products')}
-              className="mt-6 rounded-full bg-gray-900 px-8 py-3 font-semibold text-white"
-            >
-              Start Shopping
-            </button>
-
-          </div>
-        ) : (
-          <div className="space-y-6">
-
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className="rounded-2xl bg-white p-6 shadow"
-              >
-
-                {/* ORDER HEADER */}
-
-                <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Order ID
-                    </p>
-
-                    <p className="font-semibold">
-                      #{order.id}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      Order Date
-                    </p>
-
-                    <p className="font-semibold">
-                      {order.date}
-                    </p>
-                  </div>
-
-                  <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-                    {order.status}
-                  </span>
-
-                </div>
-
-                {/* PRODUCTS */}
-
-                <div className="space-y-4">
-
-                  {order.products.map((product, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
-                    >
-
-                      <div className="flex items-center gap-4">
-
-                        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white text-3xl">
-                          {product.image}
-                        </div>
-
-                        <div>
-                          <h3 className="font-semibold">
-                            {product.name}
-                          </h3>
-
-                          <p className="text-sm text-gray-500">
-                            {product.category}
-                          </p>
-                        </div>
-
-                      </div>
-
-                      <p className="font-semibold">
-                        ₹{product.price}
-                      </p>
-
-                    </div>
-                  ))}
-
-                </div>
-
-                {/* TOTAL */}
-
-                <div className="mt-5 flex justify-between border-t pt-5 text-xl font-bold">
-                  <span>Total</span>
-
-                  <span>
-                    ₹{order.total}
-                  </span>
-                </div>
-
-                {/* CUSTOMER */}
-
-                <div className="mt-5 rounded-xl bg-gray-50 p-4">
-
-                  <h3 className="mb-2 font-bold">
-                    Delivery Address
-                  </h3>
-
-                  <p>
-                    {order.customer.name}
-                  </p>
-
-                  <p className="text-gray-600">
-                    {order.customer.phone}
-                  </p>
-
-                  <p className="text-gray-600">
-                    {order.customer.address}
-                  </p>
-
-                  <p className="text-gray-600">
-                    {order.customer.city} -{' '}
-                    {order.customer.pincode}
-                  </p>
-
-                </div>
-
-              </div>
-            ))}
-
-          </div>
-        )}
-
+        <p className="mt-2 text-gray-500">
+          Track and view your previous orders.
+        </p>
       </div>
-    </div>
+
+      <div className="space-y-5">
+        {orders.map((order) => {
+          const itemCount = order.products.reduce(
+            (total, item) => total + item.quantity,
+            0
+          )
+
+          const orderDate = new Date(order.date)
+
+          return (
+            <div
+              key={order.id}
+              className="rounded-2xl border border-gray-200 bg-white p-6 transition hover:shadow-md"
+            >
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Order ID
+                  </p>
+
+                  <h2 className="mt-1 font-bold text-gray-900">
+                    {order.id}
+                  </h2>
+                </div>
+
+                <span className="w-fit rounded-full bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
+                  {order.status}
+                </span>
+              </div>
+
+              <div className="mt-6 grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-3">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Order Date
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-900">
+                    {orderDate.toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Items
+                  </p>
+
+                  <p className="mt-1 font-medium text-gray-900">
+                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">
+                    Total
+                  </p>
+
+                  <p className="mt-1 font-bold text-gray-900">
+                    ₹{order.total.toLocaleString('en-IN')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => navigate(`/orders/${order.id}`)}
+                  className="rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-700"
+                >
+                  View Details →
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </main>
   )
 }
 

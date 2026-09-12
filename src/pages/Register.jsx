@@ -2,8 +2,8 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
-// Validation rules
 const schema = yup.object({
   name: yup
     .string()
@@ -23,7 +23,10 @@ const schema = yup.object({
   confirmPassword: yup
     .string()
     .required('Please confirm your password')
-    .oneOf([yup.ref('password')], 'Passwords must match'),
+    .oneOf(
+      [yup.ref('password')],
+      'Passwords must match'
+    ),
 })
 
 function Register() {
@@ -38,31 +41,59 @@ function Register() {
   })
 
   const onSubmit = (data) => {
-    // Save user locally for now
+    const existingUser =
+      localStorage.getItem('babafly-user')
+
+    if (existingUser) {
+      const user = JSON.parse(existingUser)
+
+      if (user.email === data.email) {
+        toast.error(
+          'An account with this email already exists.'
+        )
+        return
+      }
+    }
+
     const user = {
       name: data.name,
       email: data.email,
       password: data.password,
     }
 
-    localStorage.setItem('babafly-user', JSON.stringify(user))
+    localStorage.setItem(
+      'babafly-user',
+      JSON.stringify(user)
+    )
 
-    alert('Account created successfully! 🎉')
+    toast.success(
+      'Account created successfully! 🎉'
+    )
 
-    navigate('/login')
+    setTimeout(() => {
+      navigate('/login')
+    }, 700)
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-10">
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg sm:p-10">
 
-        <h1 className="text-3xl font-bold">
-          Create Account
-        </h1>
+        <div className="text-center">
 
-        <p className="mt-2 text-gray-600">
-          Join BabaFly today 💎
-        </p>
+          <div className="text-5xl">
+            💎
+          </div>
+
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">
+            Create Account
+          </h1>
+
+          <p className="mt-2 text-gray-500">
+            Join BabaFly today
+          </p>
+
+        </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -71,7 +102,8 @@ function Register() {
 
           {/* Name */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Full Name
             </label>
 
@@ -79,7 +111,11 @@ function Register() {
               type="text"
               placeholder="Enter your name"
               {...register('name')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.name
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.name && (
@@ -87,11 +123,13 @@ function Register() {
                 {errors.name.message}
               </p>
             )}
+
           </div>
 
           {/* Email */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Email
             </label>
 
@@ -99,7 +137,11 @@ function Register() {
               type="email"
               placeholder="Enter your email"
               {...register('email')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.email
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.email && (
@@ -107,19 +149,25 @@ function Register() {
                 {errors.email.message}
               </p>
             )}
+
           </div>
 
           {/* Password */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Password
             </label>
 
             <input
               type="password"
-              placeholder="Enter password"
+              placeholder="Create a password"
               {...register('password')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.password
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.password && (
@@ -127,19 +175,25 @@ function Register() {
                 {errors.password.message}
               </p>
             )}
+
           </div>
 
           {/* Confirm Password */}
           <div>
-            <label className="mb-2 block font-medium">
+
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
               Confirm Password
             </label>
 
             <input
               type="password"
-              placeholder="Confirm password"
+              placeholder="Confirm your password"
               {...register('confirmPassword')}
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
+              className={`w-full rounded-xl border px-4 py-3 outline-none transition ${
+                errors.confirmPassword
+                  ? 'border-red-500'
+                  : 'border-gray-300 focus:border-gray-900'
+              }`}
             />
 
             {errors.confirmPassword && (
@@ -147,12 +201,12 @@ function Register() {
                 {errors.confirmPassword.message}
               </p>
             )}
+
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-full bg-gray-900 py-3 font-semibold text-white transition hover:bg-gray-700"
+            className="w-full rounded-full bg-gray-900 py-3.5 font-semibold text-white transition hover:bg-gray-700"
           >
             Create Account
           </button>
@@ -161,9 +215,10 @@ function Register() {
 
         <p className="mt-6 text-center text-gray-600">
           Already have an account?{' '}
+
           <Link
             to="/login"
-            className="font-semibold text-gray-900 underline"
+            className="font-semibold text-gray-900 hover:underline"
           >
             Login
           </Link>
